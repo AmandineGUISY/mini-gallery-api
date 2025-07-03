@@ -4,9 +4,8 @@ from sqlalchemy.orm import sessionmaker
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./photos.db"
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}, echo=True
-)
+engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
@@ -15,9 +14,11 @@ class DBPhoto(Base):
     __tablename__ = "photos"
 
     id = Column(Integer, primary_key=True, index=True)
-    url = Column(String)
-    title = Column(String)
-    category = Column(String)
+    title = Column(String(100))
+    category = Column(String(50))
     tags = Column(JSON)
+    image_url = Column(String(200))
+    thumbnail_url = Column(String(200))
 
-Base.metadata.create_all(bind=engine)
+def init_db():
+    Base.metadata.create_all(bind=engine)

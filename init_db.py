@@ -8,16 +8,18 @@ def init_db():
     
     initial_photos = [
         DBPhoto(
-            url="https://picsum.photos/id/1/300",
             title="Photo 1",
             category="Nature",
-            tags=["fleurs", "printemps"]
+            tags=["fleurs", "printemps"],
+            image_url="https://picsum.photos/id/1/300",
+            thumbnail_url="https://picsum.photos/id/1/150"
         ),
         DBPhoto(
-            url="https://picsum.photos/id/2/300",
             title="Photo 2",
             category="Ville",  # Correction: "Ville" au lieu de "Ville"
-            tags=["nuit", "lumière"]
+            tags=["nuit", "lumière"],
+            image_url="https://picsum.photos/id/2/300",
+            thumbnail_url="https://picsum.photos/id/2/150"
         )
     ]
     

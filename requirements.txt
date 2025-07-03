@@ -1,5 +1,6 @@
 fastapi
 uvicorn
-pydantic
+python-multipart
 sqlalchemy
-databases[aiosqlite]
+python-jose[cryptography]
+pillow
