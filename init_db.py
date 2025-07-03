@@ -16,7 +16,7 @@ def init_db():
         ),
         DBPhoto(
             title="Photo 2",
-            category="Ville",  # Correction: "Ville" au lieu de "Ville"
+            category="Ville",
             tags=["nuit", "lumière"],
             image_url="https://picsum.photos/id/2/300",
             thumbnail_url="https://picsum.photos/id/2/150"
