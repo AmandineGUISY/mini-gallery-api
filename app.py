@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 app = FastAPI()
 
 def get_db():
-    db: SessionLocal()
+    db = SessionLocal()
     try:
         yield db
     finally:
@@ -19,22 +19,24 @@ def get_photos(category: Optional[str] = None, tags: Optional[List[str]] = Query
     query = db.query(DBPhoto)
 
     if category:
-        query = query.filter(DBPhoto.category.ilike(category))
+        query = query.filter(DBPhoto.category.ilike(f"%{category}%"))
 
     if tags:
-        query = query.filter(DBPhoto.tags.contains(tags))
+        for tag in tags:
+            query = query.filter(DBPhoto.tags.contains([tags]))
         
     return query.all()
 
 
 @app.post("/photos", response_model=Photo)
 def add_photo(photo_data: PhotoCreate, db: Session = Depends(get_db)):
+
     db_photo = DBPhoto(**photo_data.dict())
     db.add(db_photo)
     db.commit()
     db.refresh(db_photo)
 
-    return new_photo
+    return db_photo
 
 @app.delete("/photos/{photo_id}", response_model=Photo)
 def delete_photo(photo_id: int, db: Session = Depends(get_db)):

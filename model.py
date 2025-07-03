@@ -14,4 +14,13 @@ class Photo(PhotoBase):
     id:int
 
     class Config:
-        orm_mode=True 
+        orm_mode=True
+        schema_extra = {
+            "example": {
+                "id": 1,
+                "url": "https://example.com/photo.jpg",
+                "title": "Une belle photo",
+                "category": "Nature",
+                "tags": ["paysage", "montagne"]
+            }
+        }
