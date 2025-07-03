@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from typing import List, Optional
 from database import SessionLocal, DBPhoto
 from schemas import Photo
@@ -8,18 +9,19 @@ from storage import handle_file_upload, delete_uploaded_files
 
 app = FastAPI()
 
-# Configurez les origines autorisées (votre frontend Vue.js)
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 origins = [
     "http://localhost:5173",
-    "http://127.0.0.1:5173", # C'est une bonne idée d'ajouter les deux
+    "http://127.0.0.1:5173",
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["*"],    # Autorise toutes les méthodes (GET, POST, etc.)
-    allow_headers=["*"],    # Autorise tous les en-têtes
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 def get_db():
