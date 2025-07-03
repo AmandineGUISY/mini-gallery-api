@@ -3,7 +3,7 @@ from typing import List, Optional
 from database import SessionLocal, DBPhoto
 from schemas import Photo
 from sqlalchemy.orm import Session
-from storage import handle_file_upload
+from storage import handle_file_upload, delete_uploaded_files
 
 app = FastAPI()
 
@@ -66,6 +66,8 @@ def delete_photo(photo_id: int, db: Session = Depends(get_db)):
     if not db_photo:
         raise HTTPException(status_code=404, detail="Photo non trouvée")
     
+    delete_uploaded_files(db_photo.image_url, db_photo.thumbnail_url)
+
     db.delete(db_photo)
     db.commit()
     return db_photo

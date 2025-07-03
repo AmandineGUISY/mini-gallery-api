@@ -30,3 +30,12 @@ async def handle_file_upload(file: UploadFile) -> dict:
         "original": f"/{original_path}",
         "thumbnail": f"/{thumbnail_path}"
     }
+
+def delete_uploaded_files(image_url: str, thumbnail_url: str):
+    try:
+        if image_url and os.path.exists(image_url.lstrip('/')):
+            os.remove(image_url.lstrip('/'))
+        if thumbnail_url and os.path.exists(thumbnail_url.lstrip('/')):
+            os.remove(thumbnail_url.lstrip('/'))
+    except Exception as e:
+        print(f"Erreur lors de la suppression des fichiers: {e}")
