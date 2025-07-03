@@ -1,42 +1,47 @@
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Depends
 from typing import List, Optional
-from model import Photo
-from pydantic import BaseModel
+from model import Photo, PhotoCreate
+from database import SessionLocal, DBPhoto
+from sqlalchemy.orm import Session
 
 app = FastAPI()
 
-class PhotoCreate(BaseModel):
-    url:str
-    title:str
-    category:str
-    tags:List[str]
-
-photos_db: List[Photo] = [
-    Photo(id=1, url="https://picsum.photos/id/1/300", title="Photo 1", category="Nature", tags=["fleurs", "printemps"]),
-    Photo(id=2, url="https://picsum.photos/id/2/300", title="Photo 2", category="Ville", tags=["nuit", "lumière"]),
-]
+def get_db():
+    db: SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 @app.get("/photos", response_model=List[Photo])
-def get_photos(category: Optional[str] = None, tags: Optional[List[str]] = Query(None)):
-    results = photos_db
+def get_photos(category: Optional[str] = None, tags: Optional[List[str]] = Query(None), db: Session = Depends(get_db)) :
+    
+    query = db.query(DBPhoto)
+
     if category:
-        results = [photo for photo in results if photo.category.lower() == category.lower()]
+        query = query.filter(DBPhoto.category.ilike(category))
+
     if tags:
-        results = [photo for photo in results if any(tag in photo.tags for tag in tags)]
-    return results
+        query = query.filter(DBPhoto.tags.contains(tags))
+        
+    return query.all()
+
 
 @app.post("/photos", response_model=Photo)
-def add_photo(photo_data: PhotoCreate):
-    new_id = max(p.id for p in photos_db) + 1 if photos_db else 1
-    new_photo = Photo(id=new_id, **photo_data.dict())
+def add_photo(photo_data: PhotoCreate, db: Session = Depends(get_db)):
+    db_photo = DBPhoto(**photo_data.dict())
+    db.add(db_photo)
+    db.commit()
+    db.refresh(db_photo)
 
-    photos_db.append(new_photo)
     return new_photo
 
 @app.delete("/photos/{photo_id}", response_model=Photo)
-def delete_photo(photo_id: int):
-    for i, photo in enumerate(photos_db):
-        if photo.id == photo_id:
-            deleted = photos_db.pop(i)
-            return deleted
-    raise HTTPException(status_code=404, detail="Photo non trouvée")
+def delete_photo(photo_id: int, db: Session = Depends(get_db)):
+    db_photo = db.query(DBPhoto).filter(DBPhoto.id == photo_id).first()
+    if not db_photo:
+        raise HTTPException(status_code=404, detail="Photo non trouvée")
+    
+    db.delete(db_photo)
+    db.commit()
+    return db_photo
