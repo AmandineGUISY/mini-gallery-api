@@ -15,8 +15,8 @@ class DBPhoto(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String(100))
-    category = Column(String(50))
-    tags = Column(JSON)
+    category = Column(String(50), nullable = True)
+    tags = Column(JSON, nullable = True)
     image_url = Column(String(200))
     thumbnail_url = Column(String(200))
 

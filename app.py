@@ -31,15 +31,15 @@ def get_photos(category: Optional[str] = None, tags: Optional[List[str]] = Query
 
     if tags:
         for tag in tags:
-            query = query.filter(DBPhoto.tags.contains([tag]))
+            query = query.filter(DBPhoto.tags.contains(tag))
         
     return query.all()
 
 @app.post("/photos", response_model=Photo)
 async def create_photo(
     title: str = Form(...),
-    category: str = Form(...),
-    tags: List[str] = Form(...),
+    category: Optional[str] = Form(None),
+    tags: Optional[List[str]] = Form(None),
     file: UploadFile = File(...),
     db: Session = Depends(get_db)
 ):
@@ -49,7 +49,7 @@ async def create_photo(
     db_photo = DBPhoto(
         title=title,
         category=category,
-        tags=tags,
+        tags=tags or [],
         image_url=urls["original"],
         thumbnail_url=urls["thumbnail"]
     )

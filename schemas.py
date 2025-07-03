@@ -3,8 +3,8 @@ from typing import List
 
 class PhotoBase(BaseModel):
     title: str
-    category: str
-    tags: List[str]
+    category: str = None
+    tags: List[str] = None
 
 class PhotoCreate(PhotoBase):
     pass
