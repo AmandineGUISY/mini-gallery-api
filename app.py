@@ -88,3 +88,14 @@ def delete_photo(photo_id: int, db: Session = Depends(get_db)):
     db.delete(db_photo)
     db.commit()
     return db_photo
+
+@app.patch("/photos/{photo_id}", response_model=Photo)
+def update_photo_title(photo_id: int, photo_update: str , db: Session = Depends(get_db)):
+    db_photo = db.query(DBPhoto).filter(DBPhoto.id == photo_id).first()
+    if not db_photo:
+        raise HTTPException(status_code=404, detail="Photo non trouvée")
+
+    db_photo.title = photo_update
+    db.commit()
+    db.refresh(db_photo)
+    return db_photo
